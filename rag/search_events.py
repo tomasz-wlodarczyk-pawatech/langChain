@@ -27,11 +27,13 @@ def get_vectorstore(source: str) -> Chroma:
 def search_events(query: str, source: str = "all", top_k: int = 5) -> list[dict]:
     vectorstore = get_vectorstore(source).as_retriever(
         search_type="similarity_score_threshold",
-        search_kwargs={"k": 10 , "score_threshold": 0.65}
+        search_kwargs={"k": 50, "score_threshold": 0.65}
     )
 
     results: list[Document] = vectorstore.invoke(query)
     event_ids = [doc.metadata.get("event_id") for doc in results]
+    for doc in results:
+        print(doc.metadata.get("score"))
     return [get_event_by_id(eid) for eid in event_ids if eid]
 
 

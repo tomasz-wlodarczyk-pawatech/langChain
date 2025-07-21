@@ -6,6 +6,7 @@ from typing import TypedDict, Literal, List, Optional
 from langgraph.graph import StateGraph
 from langchain_core.runnables import RunnableLambda
 
+from rag.llm_chain_search import llm_chain_search
 from rag.llm_router_chain import llm_router_chain
 from rag.search_events import search_events
 from rag.event_lookup import get_event_by_id, fetch_live_events
@@ -62,8 +63,34 @@ def router(state: AgentState) -> AgentState:
 
 
 def format_output_rag(state: AgentState) -> dict:
-    response = state.get("matches", [])
-    return {"results": response}
+    query = state.get("query", "")
+    matches = state.get("matches", [])
+
+    if not matches:
+        return {"results": []}
+
+    # Formatuj dane eventów do wejścia dla LLM
+    events_text = "\n\n".join([
+        f"Event: {e.get('event_name', 'N/A')}\n"
+        f"event_id: {e.get('event_id', 'N/A')}\n"
+        f"Competition: {e.get('competition', 'N/A')}"
+        for e in matches
+    ])
+
+    # Wywołaj LLM z przygotowanym tekstem
+    response = llm_chain_search.invoke({
+        "user_query": query,
+        "events": events_text
+    })
+
+    # Debugging output
+    print(response.root)
+
+    # Załaduj szczegóły eventów na podstawie id zwróconych przez LLM
+    results = [get_event_by_id(eid.event_id) for eid in response.root if eid]
+
+    return {"results": results}
+
 
 # === Node: Format output with LLM ===
 def format_output(state: AgentState) -> dict:
