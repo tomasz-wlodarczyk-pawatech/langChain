@@ -15,7 +15,7 @@ class Query(BaseModel):
 @app.post("/ask")
 def ask(query: Query):
     response = agent.ask(query.question)
-    return { response.get("results", [])}
+    return { "response": response.get("results", [])}
 
 @app.get("/")
 def root():
