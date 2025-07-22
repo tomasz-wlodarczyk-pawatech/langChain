@@ -11,6 +11,29 @@ from rag.llm_router_chain import llm_router_chain
 from rag.search_events import search_events
 from rag.event_lookup import get_event_by_id, fetch_live_events
 from rag.llm_chain import llm_chain
+from graphviz import Digraph
+
+
+def visualize_custom_graph():
+    dot = Digraph()
+
+    dot.node("router")
+    dot.node("rag_search")
+    dot.node("live_fallback")
+    dot.node("output")
+
+    dot.edge("router", "rag_search", )
+    dot.edge("router", "live_fallback")
+    dot.edge("rag_search", "live_fallback")
+    dot.edge("rag_search", "output")
+    dot.edge("live_fallback", "output")
+    dot.edge("live_fallback", "router")
+
+    dot.render("event_graph", format="png", cleanup=False)
+    print("Graph saved as event_graph.png")
+
+
+visualize_custom_graph()
 
 
 # === State ===
@@ -28,7 +51,6 @@ def vector_search(state: AgentState) -> AgentState:
     return {
         **state,
         "matches": matches,
-        "selected_event": matches[0] if matches else None,
     }
 
 
@@ -39,7 +61,6 @@ def fallback_live(state: AgentState) -> AgentState:
     return {
         **state,
         "matches": matches,
-        "selected_event": matches[0] if matches else None,
     }
 
 
@@ -77,19 +98,22 @@ def format_output_rag(state: AgentState) -> dict:
         for e in matches
     ])
 
+    print(len(events_text))
     # Wywołaj LLM z przygotowanym tekstem
-    response = llm_chain_search.invoke({
-        "user_query": query,
-        "events": events_text
-    })
+
 
     # Debugging output
-    print(response.root)
 
-    # Załaduj szczegóły eventów na podstawie id zwróconych przez LLM
-    results = [get_event_by_id(eid.event_id) for eid in response.root if eid]
+    if (state["route"] == "rag_search"):
+        response = llm_chain_search.invoke({
+            "user_query": query,
+            "events": events_text
+        })
+        results = [get_event_by_id(eid.event_id) for eid in response.root if eid]
+        return {"results": results}
 
-    return {"results": results}
+
+    return {"results": matches}
 
 
 # === Node: Format output with LLM ===
@@ -163,5 +187,6 @@ def build_event_graph():
     builder.add_edge("live_fallback", "output")
 
     builder.set_finish_point("output")
+    visualize_custom_graph()
 
     return builder.compile()
