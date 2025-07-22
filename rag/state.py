@@ -11,29 +11,7 @@ from rag.llm_router_chain import llm_router_chain
 from rag.search_events import search_events
 from rag.event_lookup import get_event_by_id, fetch_live_events
 from rag.llm_chain import llm_chain
-from graphviz import Digraph
 
-
-def visualize_custom_graph():
-    dot = Digraph()
-
-    dot.node("router")
-    dot.node("rag_search")
-    dot.node("live_fallback")
-    dot.node("output")
-
-    dot.edge("router", "rag_search", )
-    dot.edge("router", "live_fallback")
-    dot.edge("rag_search", "live_fallback")
-    dot.edge("rag_search", "output")
-    dot.edge("live_fallback", "output")
-    dot.edge("live_fallback", "router")
-
-    dot.render("event_graph", format="png", cleanup=False)
-    print("Graph saved as event_graph.png")
-
-
-visualize_custom_graph()
 
 
 # === State ===
@@ -187,6 +165,5 @@ def build_event_graph():
     builder.add_edge("live_fallback", "output")
 
     builder.set_finish_point("output")
-    visualize_custom_graph()
 
     return builder.compile()
