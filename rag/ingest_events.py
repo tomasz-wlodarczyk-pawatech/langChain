@@ -15,7 +15,7 @@ EMBEDDING_MODEL = OpenAIEmbeddings()
 DATA_DIR = Path("data")
 CHROMA_DIR = Path("rag/chroma_db")
 POPULAR_URL = "https://pawa-proxy.replit.app/apiplus/events/popular?x-pawa-brand=betpawa-uganda"
-ALL_URL = "https://pawa-proxy.replit.app/apiplus/events/all?x-pawa-brand=betpawa-uganda"
+# ALL_URL = "https://pawa-proxy.replit.app/apiplus/events/all?x-pawa-brand=betpawa-uganda"
 
 text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
     chunk_size=250,
@@ -79,10 +79,10 @@ def main():
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
     popular_events = fetch_and_store(POPULAR_URL, "popular.json")
-    all_events = fetch_and_store(ALL_URL, "all.json")
+    # all_events = fetch_and_store(ALL_URL, "all.json")
 
     ingest_to_chroma(popular_events, "popular")
-    ingest_to_chroma(all_events, "all")
+    # ingest_to_chroma(all_events, "all")
 
 
 if __name__ == "__main__":
