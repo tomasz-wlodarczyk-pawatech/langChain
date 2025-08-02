@@ -62,28 +62,30 @@ def event_to_document(event: dict) -> Document:
 
 
 def ingest_to_chroma(events: list[dict], index_name: str):
-    # ...
+    print(f"⚙️ Ingesting {len(events)} events into '{index_name}'...")
+
+    docs = [event_to_document(e) for e in events]
+    docs_split = text_splitter.split_documents(docs)
+
     persist_path = CHROMA_DIR / index_name
 
+    # 💣 Usuń starą bazę
     if persist_path.exists():
         print(f"🗑️ Removing existing index at {persist_path}")
         shutil.rmtree(persist_path)
-
-    # Sprawdź czy katalog usunięty
     print("Katalog istnieje po usunięciu?", persist_path.exists())
-
+    # 💾 Stwórz katalog na nowo
     persist_path.mkdir(parents=True, exist_ok=True)
-    print("Katalog utworzony:", persist_path.exists())
 
-    # Tworzymy indeks
-    Chroma.from_documents(
+    print(f"📁 Saving {len(docs_split)} chunks to {persist_path}")
+
+    db = Chroma.from_documents(
         documents=docs_split,
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
     )
-    print("Pliki w katalogu po indeksacji:", os.listdir(persist_path))
 
-    time.sleep(3)
+    time.sleep(12)
     print("✅ Chroma index created.")
 
 
