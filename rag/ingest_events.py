@@ -79,7 +79,7 @@ def ingest_to_chroma(events: list[dict], index_name: str):
 
     print(f"📁 Saving {len(docs_split)} chunks to {persist_path}")
 
-    db = Chroma.from_documents(
+    Chroma.from_documents(
         documents=docs_split,
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
