@@ -1,6 +1,7 @@
 import os
 import json
 import shutil
+import time
 
 import requests
 from pathlib import Path
@@ -83,7 +84,7 @@ def ingest_to_chroma(events: list[dict], index_name: str):
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
     )
-
+    time.sleep(12)
     print("✅ Chroma index created.")
 
 
