@@ -12,8 +12,8 @@ from langchain_openai import OpenAIEmbeddings
 load_dotenv()
 
 EMBEDDING_MODEL = OpenAIEmbeddings()
-DATA_DIR = Path("data")
-CHROMA_DIR = Path("rag/chroma_db")
+DATA_DIR = Path("/var/disk/data")
+CHROMA_DIR = Path("/var/disk/chroma_db")
 # POPULAR_URL = "https://pawa-proxy.replit.app/apiplus/events/popular?x-pawa-brand=betpawa-uganda"
 ALL_URL = "https://pawa-proxy.replit.app/apiplus/events/all?x-pawa-brand=betpawa-uganda"
 
