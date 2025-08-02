@@ -1,5 +1,7 @@
 import os
 import json
+import shutil
+
 import requests
 from pathlib import Path
 from dotenv import load_dotenv
@@ -59,30 +61,46 @@ def event_to_document(event: dict) -> Document:
 
 
 def ingest_to_chroma(events: list[dict], index_name: str):
-    print(f"Ingesting {len(events)} events into '{index_name}' index...")
+    print(f"⚙️ Ingesting {len(events)} events into '{index_name}'...")
 
     docs = [event_to_document(e) for e in events]
     docs_split = text_splitter.split_documents(docs)
 
     persist_path = CHROMA_DIR / index_name
+
+    # 💣 Usuń starą bazę
+    if persist_path.exists():
+        print(f"🗑️ Removing existing index at {persist_path}")
+        shutil.rmtree(persist_path)
+
+    # 💾 Stwórz katalog na nowo
+    persist_path.mkdir(parents=True, exist_ok=True)
+
+    print(f"📁 Saving {len(docs_split)} chunks to {persist_path}")
+
     Chroma.from_documents(
         documents=docs_split,
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
     )
 
-    print(f"Saved {len(docs_split)} chunks to Chroma index: '{index_name}'")
+    print("✅ Chroma index created.")
 
 
 def main():
-    DATA_DIR.mkdir(parents=True, exist_ok=True)
-    CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+    try:
+        print("🚀 Starting")
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
-    # popular_events = fetch_and_store(POPULAR_URL, "popular.json")
-    all_events = fetch_and_store(ALL_URL, "all.json")
+        all_events = fetch_and_store(ALL_URL, "all.json")
+        ingest_to_chroma(all_events, "all")
 
-    # ingest_to_chroma(popular_events, "popular")
-    ingest_to_chroma(all_events, "all")
+        print("✅ Done.")
+    except Exception as e:
+        print("❌ Exception:", e)
+        import traceback
+        traceback.print_exc()
 
 
 if __name__ == "__main__":
