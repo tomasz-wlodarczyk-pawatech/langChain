@@ -64,11 +64,11 @@ def router(state: AgentState) -> AgentState:
 def format_output_rag(state: AgentState) -> dict:
     query = state.get("query", "")
     matches = state.get("matches", [])
-
+    print("Matches:", matches)
     if not matches:
         return {"results": []}
 
-    # Formatuj dane eventów do wejścia dla LLM
+
     events_text = "\n\n".join([
         f"Event: {e.get('event_name', 'N/A')}\n"
         f"event_id: {e.get('event_id', 'N/A')}\n"
