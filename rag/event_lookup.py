@@ -1,13 +1,10 @@
 from __future__ import annotations
-
-from pathlib import Path
-
 import requests
 
 import json
-
-DATA_DIR = Path("/var/disk/data")  # Poprawnie jako Path
-
+from pathlib import Path
+BASE_DIR = Path(__file__).resolve().parent.parent
+DATA_DIR = BASE_DIR / "rag/data"
 popular_path = DATA_DIR / "popular.json"
 all_path = DATA_DIR / "all.json"
 
@@ -21,13 +18,11 @@ ALL_EVENTS_MAP = {
     e["event_id"]: e for e in popular_events + all_events
 }
 
-
 def get_event_by_id(event_id: str) -> dict | None:
     return ALL_EVENTS_MAP.get(event_id)
 
 
 LIVE_URL = "https://pawa-proxy.replit.app/apiplus/events/live?x-pawa-brand=betpawa-uganda"
-
 
 def fetch_live_events() -> list[dict]:
     response = requests.get(LIVE_URL)

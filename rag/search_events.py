@@ -10,7 +10,7 @@ from rag.llm_chain import llm_chain
 
 load_dotenv()
 
-CHROMA_BASE_DIR = Path("/var/disk/chroma_db")
+CHROMA_BASE_DIR = Path("rag/rag/chroma_db")
 EMBEDDING_MODEL = OpenAIEmbeddings()
 
 

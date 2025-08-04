@@ -1,13 +1,12 @@
 import os
 import json
 import shutil
-import time
 
 import requests
 from pathlib import Path
 from dotenv import load_dotenv
 
-from langchain.vectorstores import Chroma
+from langchain_chroma import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_openai import OpenAIEmbeddings
@@ -15,8 +14,8 @@ from langchain_openai import OpenAIEmbeddings
 load_dotenv()
 
 EMBEDDING_MODEL = OpenAIEmbeddings()
-DATA_DIR = Path("/var/disk/data")
-CHROMA_DIR = Path("/var/disk/chroma_db")
+DATA_DIR = Path("data")
+CHROMA_DIR = Path("rag/chroma_db")
 # POPULAR_URL = "https://pawa-proxy.replit.app/apiplus/events/popular?x-pawa-brand=betpawa-uganda"
 ALL_URL = "https://pawa-proxy.replit.app/apiplus/events/all?x-pawa-brand=betpawa-uganda"
 
@@ -62,49 +61,33 @@ def event_to_document(event: dict) -> Document:
 
 
 def ingest_to_chroma(events: list[dict], index_name: str):
-    print(f"⚙️ Ingesting {len(events)} events into '{index_name}'...")
+    print(f"Ingesting {len(events)} events into '{index_name}' index...")
 
     docs = [event_to_document(e) for e in events]
     docs_split = text_splitter.split_documents(docs)
 
     persist_path = CHROMA_DIR / index_name
-
-    # 💣 Usuń starą bazę
     if persist_path.exists():
-        print(f"🗑️ Removing existing index at {persist_path}")
+        print(f"Removing old Chroma DB at {persist_path}")
         shutil.rmtree(persist_path)
-    print("Katalog istnieje po usunięciu?", persist_path.exists())
-    # 💾 Stwórz katalog na nowo
-    persist_path.mkdir(parents=True, exist_ok=True)
-
-    print(f"📁 Saving {len(docs_split)} chunks to {persist_path}")
-
-    store = Chroma.from_documents(
+    Chroma.from_documents(
         documents=docs_split,
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
     )
 
-    store.persist()
-
-    time.sleep(12)
-    print("✅ Chroma index created.")
+    print(f"Saved {len(docs_split)} chunks to Chroma index: '{index_name}'")
 
 
 def main():
-    try:
-        print("🚀 Starting")
-        DATA_DIR.mkdir(parents=True, exist_ok=True)
-        CHROMA_DIR.mkdir(parents=True, exist_ok=True)
+    DATA_DIR.mkdir(parents=True, exist_ok=True)
+    CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
-        all_events = fetch_and_store(ALL_URL, "all.json")
-        ingest_to_chroma(all_events, "all")
+    # popular_events = fetch_and_store(POPULAR_URL, "popular.json")
+    all_events = fetch_and_store(ALL_URL, "all.json")
 
-        print("✅ Done.")
-    except Exception as e:
-        print("❌ Exception:", e)
-        import traceback
-        traceback.print_exc()
+    # ingest_to_chroma(popular_events, "popular")
+    ingest_to_chroma(all_events, "all")
 
 
 if __name__ == "__main__":
