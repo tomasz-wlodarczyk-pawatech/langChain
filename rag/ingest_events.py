@@ -19,8 +19,8 @@ print("📂 Current working dir:", os.getcwd())
 print("📄 This file is in:", Path(__file__).resolve())
 
 EMBEDDING_MODEL = OpenAIEmbeddings()
-DATA_DIR = Path("data")
-CHROMA_DIR = Path("rag/chroma_db")
+DATA_DIR = Path("/opt/render/project/src/rag/data")
+CHROMA_DIR = Path("/opt/render/project/src/rag/rag/chroma_db")
 # POPULAR_URL = "https://pawa-proxy.replit.app/apiplus/events/popular?x-pawa-brand=betpawa-uganda"
 ALL_URL = "https://pawa-proxy.replit.app/apiplus/events/all?x-pawa-brand=betpawa-uganda"
 
@@ -72,10 +72,6 @@ def ingest_to_chroma(events: list[dict], index_name: str):
     docs_split = text_splitter.split_documents(docs)
 
     persist_path = Path("/opt/render/project/src/rag/rag/chroma_db/all")
-
-    if persist_path.exists():
-        print(f"Removing old Chroma DB at {persist_path}")
-        shutil.rmtree(persist_path)
 
     print("💾 Zapisuję do:", persist_path.resolve())
     Chroma.from_documents(
