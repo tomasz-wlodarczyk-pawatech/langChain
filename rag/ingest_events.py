@@ -1,6 +1,7 @@
 import os
 import json
 import shutil
+import time
 
 import requests
 from pathlib import Path
@@ -97,4 +98,8 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    while True:
+        print("🔁 Refresh started")
+        main()
+        print("⏱️ Sleeping for 60 seconds...\n")
+        time.sleep(60)
