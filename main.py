@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+from rag.event_lookup import refresh_endpoint_json
 from rag.ingest_events import refresh_endpoint
 from session import AgentSession
 
@@ -22,6 +23,7 @@ def ask(query: Query):
 def refresh():
     refresh_endpoint()
     agent.reload_graph()
+    refresh_endpoint_json()
     return { "response": "OK"}
 @app.get("/")
 def root():
