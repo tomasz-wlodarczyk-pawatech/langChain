@@ -7,12 +7,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 DATA_DIR = BASE_DIR / "rag/data"
 all_path = DATA_DIR / "all.json"
 
-with open(all_path, encoding="utf-8") as f:
-    all_events = json.load(f)
-
-ALL_EVENTS_MAP = {
-    e["event_id"]: e for e in all_events
-}
 
 def get_event_by_id(event_id: str) -> dict | None:
     try:
