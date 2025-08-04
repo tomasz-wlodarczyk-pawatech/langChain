@@ -7,7 +7,7 @@ import requests
 from pathlib import Path
 from dotenv import load_dotenv
 
-from langchain_chroma import Chroma
+from langchain.vectorstores import Chroma
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_openai import OpenAIEmbeddings
@@ -79,11 +79,13 @@ def ingest_to_chroma(events: list[dict], index_name: str):
 
     print(f"📁 Saving {len(docs_split)} chunks to {persist_path}")
 
-    Chroma.from_documents(
+    store = Chroma.from_documents(
         documents=docs_split,
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
     )
+
+    store.persist()
 
     time.sleep(12)
     print("✅ Chroma index created.")
