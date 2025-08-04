@@ -71,7 +71,7 @@ def ingest_to_chroma(events: list[dict], index_name: str):
     docs = [event_to_document(e) for e in events]
     docs_split = text_splitter.split_documents(docs)
 
-    persist_path = Path("/opt/render/project/src/rag/chroma_db/all")
+    persist_path = Path("/opt/render/project/src/rag/rag/chroma_db/all")
 
     if persist_path.exists():
         print(f"Removing old Chroma DB at {persist_path}")
