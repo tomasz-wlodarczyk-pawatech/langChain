@@ -11,7 +11,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_openai import OpenAIEmbeddings
 
+
+
 load_dotenv()
+
+print("📂 Current working dir:", os.getcwd())
+print("📄 This file is in:", Path(__file__).resolve())
 
 EMBEDDING_MODEL = OpenAIEmbeddings()
 DATA_DIR = Path("data")
@@ -66,16 +71,21 @@ def ingest_to_chroma(events: list[dict], index_name: str):
     docs = [event_to_document(e) for e in events]
     docs_split = text_splitter.split_documents(docs)
 
-    persist_path = CHROMA_DIR / index_name
+    persist_path = Path("/opt/render/project/src/rag/chroma_db/all")
+
     if persist_path.exists():
         print(f"Removing old Chroma DB at {persist_path}")
         shutil.rmtree(persist_path)
+
+    print("💾 Zapisuję do:", persist_path.resolve())
     Chroma.from_documents(
         documents=docs_split,
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
     )
-
+    for root, dirs, files in os.walk(persist_path):
+        for f in files:
+            print("📦", os.path.join(root, f))
     print(f"Saved {len(docs_split)} chunks to Chroma index: '{index_name}'")
 
 
