@@ -1,7 +1,5 @@
 import os
 import json
-import shutil
-import time
 
 import requests
 from pathlib import Path
@@ -12,17 +10,12 @@ from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.docstore.document import Document
 from langchain_openai import OpenAIEmbeddings
 
-
-
 load_dotenv()
 
-print("📂 Current working dir:", os.getcwd())
-print("📄 This file is in:", Path(__file__).resolve())
 
 EMBEDDING_MODEL = OpenAIEmbeddings()
 DATA_DIR = Path("rag/data")
 CHROMA_DIR = Path("/opt/render/project/src/rag/rag/chroma_db")
-# POPULAR_URL = "https://pawa-proxy.replit.app/apiplus/events/popular?x-pawa-brand=betpawa-uganda"
 ALL_URL = "https://pawa-proxy.replit.app/apiplus/events/all?x-pawa-brand=betpawa-uganda"
 
 text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
@@ -31,7 +24,6 @@ text_splitter = RecursiveCharacterTextSplitter.from_tiktoken_encoder(
 )
 
 
-# === Helper: fetch + save JSON ===
 def fetch_and_store(url: str, filename: str) -> list[dict]:
     response = requests.get(url)
     response.raise_for_status()
@@ -74,15 +66,12 @@ def ingest_to_chroma(events: list[dict], index_name: str):
 
     persist_path = Path("/opt/render/project/src/rag/rag/chroma_db/all")
 
-    print("💾 Zapisuję do:", persist_path.resolve())
     Chroma.from_documents(
         documents=docs_split,
         embedding=EMBEDDING_MODEL,
         persist_directory=str(persist_path)
     )
-    for root, dirs, files in os.walk(persist_path):
-        for f in files:
-            print("📦", os.path.join(root, f))
+
     print(f"Saved {len(docs_split)} chunks to Chroma index: '{index_name}'")
 
 
@@ -90,16 +79,11 @@ def refresh_endpoint():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
-    # popular_events = fetch_and_store(POPULAR_URL, "popular.json")
     all_events = fetch_and_store(ALL_URL, "all.json")
 
-    # ingest_to_chroma(popular_events, "popular")
     ingest_to_chroma(all_events, "all")
 
 
 if __name__ == "__main__":
-    while True:
-        print("🔁 Refresh started")
-        refresh_endpoint()
-        print("⏱️ Sleeping for 60 seconds...\n")
-        time.sleep(60)
+    refresh_endpoint()
+    print("⏱️ Sleeping for 60 seconds...\n")
