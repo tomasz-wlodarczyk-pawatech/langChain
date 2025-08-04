@@ -1,7 +1,14 @@
 from rag.state import build_event_graph
 
+
 class AgentSession:
     def __init__(self):
+        self.graph = build_event_graph()
+        self.last_event = None
+        self.last_matches = []
+        self.last_results = []
+
+    def reload_graph(self):
         self.graph = build_event_graph()
         self.last_event = None
         self.last_matches = []

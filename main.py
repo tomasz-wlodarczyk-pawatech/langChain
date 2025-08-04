@@ -21,6 +21,7 @@ def ask(query: Query):
 @app.get("/refresh")
 def refresh():
     refresh_endpoint()
+    agent.reload_graph()
     return { "response": "OK"}
 @app.get("/")
 def root():
