@@ -86,7 +86,7 @@ def ingest_to_chroma(events: list[dict], index_name: str):
     print(f"Saved {len(docs_split)} chunks to Chroma index: '{index_name}'")
 
 
-def main():
+def refresh_endpoint():
     DATA_DIR.mkdir(parents=True, exist_ok=True)
     CHROMA_DIR.mkdir(parents=True, exist_ok=True)
 
@@ -100,6 +100,6 @@ def main():
 if __name__ == "__main__":
     while True:
         print("🔁 Refresh started")
-        main()
+        refresh_endpoint()
         print("⏱️ Sleeping for 60 seconds...\n")
         time.sleep(60)

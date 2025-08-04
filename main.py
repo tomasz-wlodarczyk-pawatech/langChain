@@ -2,6 +2,7 @@ from fastapi import FastAPI
 from pydantic import BaseModel
 from dotenv import load_dotenv
 
+from rag.ingest_events import refresh_endpoint
 from session import AgentSession
 
 load_dotenv()
@@ -17,6 +18,10 @@ def ask(query: Query):
     response = agent.ask(query.question)
     return { "response": response.get("results", [])}
 
+@app.get("/refresh")
+def refresh():
+    refresh_endpoint()
+    return { "response": "OK"}
 @app.get("/")
 def root():
     return {"status": "Agent API running"}
