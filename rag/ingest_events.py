@@ -14,7 +14,7 @@ load_dotenv()
 
 
 EMBEDDING_MODEL = OpenAIEmbeddings()
-DATA_DIR = Path("rag/data")
+DATA_DIR = Path("/opt/render/project/src/rag/data")
 CHROMA_DIR = Path("/opt/render/project/src/rag/rag/chroma_db")
 ALL_URL = "https://pawa-proxy.replit.app/apiplus/events/all?x-pawa-brand=betpawa-uganda"
 

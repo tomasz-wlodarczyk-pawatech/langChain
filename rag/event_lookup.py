@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-DATA_DIR = BASE_DIR / "rag/data"
+DATA_DIR = Path("/opt/render/project/src/rag/data")
 all_path = DATA_DIR / "all.json"
 
 ALL_EVENTS_MAP: dict[str, dict] = {}
